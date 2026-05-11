@@ -94,7 +94,7 @@ app:
     enabled: ${EMAIL_ENABLED:false}
 
   cors:
-    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173,https://*.vercel.app}
 
 # ───────────────── NOTIFICATIONS ─────────────────
 notification:
