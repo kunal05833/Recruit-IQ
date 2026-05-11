@@ -10,6 +10,7 @@
         <version>3.2.5</version>
         <relativePath/>
     </parent>
+    <packaging>jar</packaging>
 
     <groupId>com.example</groupId>
     <artifactId>ai-recruitment-platform</artifactId>

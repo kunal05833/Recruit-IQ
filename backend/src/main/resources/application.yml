@@ -2,7 +2,8 @@
 #  AI Recruitment Platform — Application Configuration
 #  All secrets must be provided via environment variables (.env file or Docker)
 # ═══════════════════════════════════════════════════════════════════════
-
+server:
+  port: ${PORT:8080}
 spring:
   application:
     name: ai-recruitment-platform
@@ -11,7 +12,7 @@ spring:
   datasource:
     url: ${DB_URL:jdbc:mysql://localhost:3306/ai_recruitment_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
     username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:@kunal123#}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 10
