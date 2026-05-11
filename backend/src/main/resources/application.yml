@@ -63,14 +63,14 @@ spring:
 
 # ── JWT ───────────────────────────────────────────────────────────────────
 jwt:
-  secret: ${JWT_SECRET:TG4XkhM3HjbLc8IEOpDtYKiw9dVa1veQA6xogUnPqf7z0rCJyS2N5FuRmsBWZl}
+  secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION_MS:86400000}         # 24 hours
   refresh-expiration: ${JWT_REFRESH_EXPIRATION_MS:604800000}  # 7 days
 
 # ── AI / OpenAI / Groq ────────────────────────────────────────────────────
 openai:
   api:
-    key: ${OPENAI_API_KEY}
+    key: ${OPENAI_API_KEY:}
     url: ${OPENAI_API_URL:https://api.groq.com/openai/v1}
 
 # ── Resume Storage ────────────────────────────────────────────────────────
