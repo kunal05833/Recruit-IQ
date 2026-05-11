@@ -1,0 +1,51 @@
+version: '3.8'
+
+# ═══════════════════════════════════════════════════════════════════════
+#  AI Recruitment Platform — Docker Compose (Local Dev)
+#  Usage: docker-compose up --build
+# ═══════════════════════════════════════════════════════════════════════
+
+services:
+
+  # ── MySQL Database ────────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: recruitment-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ai_recruitment_db
+      MYSQL_USER: recruitment_user
+      MYSQL_PASSWORD: ${DB_PASSWORD:-rootpassword}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql-init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Spring Boot App ───────────────────────────────────────────────────
+  app:
+    build: .
+    container_name: recruitment-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/ai_recruitment_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      DB_USERNAME: root
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+
+volumes:
+  mysql_data:

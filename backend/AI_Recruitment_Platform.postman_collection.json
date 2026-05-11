@@ -1,0 +1,429 @@
+{
+  "info": {
+    "name": "AI Recruitment Platform API",
+    "description": "Complete API test collection for AI Recruitment Platform v1.0.0\n\nSetup:\n1. Start the Spring Boot backend (port 8080)\n2. Run 'Register Candidate' or 'Register Recruiter'\n3. Copy the accessToken from the response\n4. In Postman, set collection variable 'token' to that value",
+    "_postman_id": "ai-recruitment-platform-v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl",  "value": "http://localhost:8080" },
+    { "key": "token",    "value": "PASTE_ACCESS_TOKEN_HERE" },
+    { "key": "jobId",    "value": "1" },
+    { "key": "appId",    "value": "1" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "🔐 Auth",
+      "item": [
+        {
+          "name": "Register Candidate",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rahul Sharma\",\n  \"email\": \"rahul@example.com\",\n  \"password\": \"SecurePass1\",\n  \"role\": \"CANDIDATE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register Recruiter",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"HR Manager\",\n  \"email\": \"hr@company.com\",\n  \"password\": \"SecurePass1\",\n  \"role\": \"RECRUITER\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "var res = pm.response.json();",
+                "if (res.data && res.data.accessToken) {",
+                "  pm.collectionVariables.set('token', res.data.accessToken);",
+                "  console.log('Token saved.');",
+                "}"
+              ]
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"rahul@example.com\",\n  \"password\": \"SecurePass1\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/refresh",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"PASTE_REFRESH_TOKEN_HERE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/auth/change-password",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"SecurePass1\",\n  \"newPassword\": \"NewSecurePass2\",\n  \"confirmPassword\": \"NewSecurePass2\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "POST",
+            "url": "{{baseUrl}}/api/auth/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "💼 Jobs",
+      "item": [
+        {
+          "name": "List All Jobs (paginated)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/jobs?page=0&size=10&sortBy=createdAt",
+              "query": [
+                { "key": "page",   "value": "0" },
+                { "key": "size",   "value": "10" },
+                { "key": "sortBy", "value": "createdAt" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Jobs by Keyword",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/jobs/search?keyword=java&page=0&size=10"
+          }
+        },
+        {
+          "name": "Filter Jobs by Location",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/jobs/filter?location=Bangalore&jobType=FULL_TIME"
+          }
+        },
+        {
+          "name": "Get Job by ID",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/jobs/{{jobId}}"
+          }
+        },
+        {
+          "name": "[RECRUITER] Post New Job",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "var res = pm.response.json();",
+                "if (res.data && res.data.id) pm.collectionVariables.set('jobId', res.data.id);"
+              ]
+            }
+          }],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "POST",
+            "url": "{{baseUrl}}/api/jobs",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Senior Java Developer\",\n  \"description\": \"We are looking for an experienced Java developer to join our team.\",\n  \"requiredSkills\": \"java, spring boot, hibernate, mysql, docker\",\n  \"jobType\": \"FULL_TIME\",\n  \"location\": \"Bangalore, India\",\n  \"experienceRequired\": \"3-5 years\",\n  \"salaryLpa\": 1500000\n}"
+            }
+          }
+        },
+        {
+          "name": "[RECRUITER] Update Job",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/jobs/{{jobId}}",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Lead Java Developer\",\n  \"requiredSkills\": \"java, spring boot, kafka, kubernetes\"\n}"
+            }
+          }
+        },
+        {
+          "name": "[RECRUITER] My Postings",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/jobs/my-postings"
+          }
+        }
+      ]
+    },
+    {
+      "name": "📄 Resume",
+      "item": [
+        {
+          "name": "[CANDIDATE] Upload Resume",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "POST",
+            "url": "{{baseUrl}}/api/resume/upload",
+            "body": {
+              "mode": "formdata",
+              "formdata": [{ "key": "file", "type": "file", "src": "/path/to/resume.pdf" }]
+            }
+          }
+        },
+        {
+          "name": "[RECRUITER] Download Resume",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/resume/download/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "👤 Profile",
+      "item": [
+        {
+          "name": "[CANDIDATE] Confirm Profile",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "POST",
+            "url": "{{baseUrl}}/api/profile/confirm",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rahul Sharma\",\n  \"email\": \"rahul@example.com\",\n  \"experience\": \"3 years of Java backend development\",\n  \"education\": \"B.Tech Computer Science, 2021\",\n  \"skills\": [\"java\", \"spring boot\", \"hibernate\", \"mysql\", \"docker\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "[CANDIDATE] Get My Profile",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/profile/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "📬 Applications",
+      "item": [
+        {
+          "name": "[CANDIDATE] Apply for Job",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "var res = pm.response.json();",
+                "if (res.data && res.data.id) pm.collectionVariables.set('appId', res.data.id);"
+              ]
+            }
+          }],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "POST",
+            "url": "{{baseUrl}}/api/applications/apply",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobId\": {{jobId}},\n  \"coverLetter\": \"I am passionate about this role and have all the required skills.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "[CANDIDATE] My Applications",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/applications/my?page=0&size=10"
+          }
+        },
+        {
+          "name": "[RECRUITER] Applications for Job",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/applications/job/{{jobId}}?page=0&size=20"
+          }
+        },
+        {
+          "name": "[RECRUITER] Shortlist Candidate",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/applications/{{appId}}/shortlist?note=Strong+technical+background"
+          }
+        },
+        {
+          "name": "[RECRUITER] Update Application Status",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/applications/{{appId}}/status",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"INTERVIEW_SCHEDULED\",\n  \"recruiterNote\": \"Scheduling technical round for next week\"\n}"
+            }
+          }
+        },
+        {
+          "name": "[RECRUITER] Application Stats",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/applications/job/{{jobId}}/stats"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🤖 AI Matching",
+      "item": [
+        {
+          "name": "[CANDIDATE] Match with Job",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "POST",
+            "url": "{{baseUrl}}/api/ai/match/{{jobId}}"
+          }
+        },
+        {
+          "name": "[RECRUITER] Ranked Candidates for Job",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/ai/match/job/{{jobId}}/ranking"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎤 AI Interview",
+      "item": [
+        {
+          "name": "[CANDIDATE] Generate Interview Questions",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "POST",
+            "url": "{{baseUrl}}/api/ai/interview/generate/{{jobId}}"
+          }
+        },
+        {
+          "name": "[CANDIDATE] Get Interview Questions",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/ai/interview/questions/{{jobId}}"
+          }
+        },
+        {
+          "name": "[CANDIDATE] Submit Answer",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "POST",
+            "url": "{{baseUrl}}/api/ai/interview/answer",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionId\": 1,\n  \"answer\": \"Spring Boot auto-configures your application based on classpath dependencies using @SpringBootApplication which combines @Configuration, @EnableAutoConfiguration and @ComponentScan. This reduces boilerplate and allows quick setup of production-ready applications.\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 AI Analytics",
+      "item": [
+        {
+          "name": "[CANDIDATE] My Analytics Dashboard",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/ai/analytics/dashboard"
+          }
+        },
+        {
+          "name": "[RECRUITER] Job Performance Ranking",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/ai/analytics/job/{{jobId}}/ranking"
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔔 Notifications",
+      "item": [
+        {
+          "name": "Get All Notifications",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/notifications"
+          }
+        },
+        {
+          "name": "Get Recent Notifications (last 20)",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/notifications/recent"
+          }
+        },
+        {
+          "name": "Get Unread Count",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "GET",
+            "url": "{{baseUrl}}/api/notifications/unread-count"
+          }
+        },
+        {
+          "name": "Mark All as Read",
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}" }] },
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/notifications/read-all"
+          }
+        }
+      ]
+    }
+  ]
+}
