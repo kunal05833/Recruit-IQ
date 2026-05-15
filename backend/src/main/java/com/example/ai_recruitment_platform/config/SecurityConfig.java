@@ -29,8 +29,8 @@ public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
 
-    @Value("${app.cors.allowed-origins}")
-    private String allowedOriginsRaw;
+  @Value("${app.cors.allowed-origins:http://localhost:3000,http://localhost:5173,https://recruit-iq-delta.vercel.app}")
+private String allowedOrigins;
 
     private static final String[] PUBLIC_ENDPOINTS = {
             "/api/auth/**",
@@ -86,7 +86,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        List<String> origins = Arrays.stream(allowedOriginsRaw.split(","))
+        List<String> origins = Arrays.stream(allowedOrigins.split(","))
                 .map(String::trim)
                 .toList();
         config.setAllowedOrigins(origins);
