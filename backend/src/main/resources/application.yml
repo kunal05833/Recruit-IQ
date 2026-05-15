@@ -94,7 +94,7 @@ app:
     enabled: ${EMAIL_ENABLED:false}
 
 cors:
-  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173,https://recruit-iq-git-main-kunal-khares-projects-2e9c9409.vercel.app,https://recruit-iq-delta.vercel.app}
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173,https://recruit-iq-git-main-kunal-khares-projects-2e9c9409.vercel.app,https://recruit-iq-delta.vercel.app}
 # ───────────────── NOTIFICATIONS ─────────────────
 notification:
   job-match-check-ms: ${JOB_MATCH_CHECK_MS:21600000}
